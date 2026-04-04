@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 
-export default function DashboardStats({ userId, devices = [] }) {
+export default function DashboardStats({ devices = [] }) {
   const [stats, setStats] = useState({ total: 0, active: 0, alerts: 0 });
 
   useEffect(() => {
@@ -15,9 +15,9 @@ export default function DashboardStats({ userId, devices = [] }) {
 
   return (
     <div style={{ display: "flex", gap: "20px", marginBottom: "30px" }}>
-      <div style={statCardStyle}> <h3>Total Devices</h3> <p>{stats.total}</p> </div>
-      <div style={statCardStyle}> <h3>Active Devices</h3> <p>{stats.active}</p> </div>
-      <div style={statCardStyle}> <h3>Alerts</h3> <p>{stats.alerts}</p> </div>
+      <div style={statCardStyle}><h3>Total Devices</h3><p>{stats.total}</p></div>
+      <div style={statCardStyle}><h3>Active Devices</h3><p>{stats.active}</p></div>
+      <div style={statCardStyle}><h3>Alerts</h3><p>{stats.alerts}</p></div>
     </div>
   );
 }
