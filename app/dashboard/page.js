@@ -34,5 +34,13 @@ export default function Dashboard() {
 
       </div>
     </div>
+
+import LiveMap from '../../components/LiveMap';
+import useDevices from '../../hooks/useDevices';
+
+export default function Dashboard() {
+  const devices = useDevices();
+  return <LiveMap devices={devices} />;
+}
   );
 }
