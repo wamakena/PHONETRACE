@@ -1,24 +1,23 @@
 "use client";
-import { MapContainer, TileLayer, Marker, Popup, CircleMarker } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 
 export default function LiveMap({ devices }) {
   return (
-    <MapContainer center={[-1.2921, 36.8219]} zoom={12} style={{ height: "600px", width: "100%" }}>
-      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+    <MapContainer center={[0, 0]} zoom={2} style={{ height: "500px", width: "100%", borderRadius: "12px" }}>
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
       {devices.map(device => (
-        <CircleMarker
-          key={device.id}
-          center={[device.latitude, device.longitude]}
-          radius={10}
-          color={device.status === "locked" ? "red" : device.status === "alert" ? "orange" : "green"}
-        >
-          <Popup>
-            <strong>{device.device_name}</strong><br/>
-            SIM: {device.sim_number}<br/>
-            Status: {device.status}<br/>
-            Battery: {device.battery_level}%
-          </Popup>
-        </CircleMarker>
+        device.lat && device.lng && (
+          <Marker key={device.id} position={[device.lat, device.lng]}>
+            <Popup>
+              <strong>{device.device_name}</strong><br />
+              Owner: {device.owner_name}<br />
+              SIM: {device.sim_number}
+            </Popup>
+          </Marker>
+        )
       ))}
     </MapContainer>
   );
