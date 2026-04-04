@@ -1,7 +1,6 @@
 export default function Home() {
   return (
     <div style={{ maxWidth: "700px", marginTop: "60px" }}>
-      
       <h1 style={{ fontSize: "48px" }}>
         Connect. Protect. Recover.
       </h1>
@@ -16,15 +15,6 @@ export default function Home() {
           Enter Command Center
         </button>
       </a>
-
     </div>
-
-import LiveMap from './components/LiveMap';
-import useDevices from './hooks/useDevices';
-
-export default function Dashboard() {
-  const devices = useDevices();
-  return <LiveMap devices={devices} />;
-}
   );
 }
