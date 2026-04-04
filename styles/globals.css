@@ -1,26 +1,48 @@
+:root {
+  --bg-main: #0A0F1F;
+  --bg-secondary: #0F2A44;
+  --accent: #00C2FF;
+  --accent-soft: #4DE1FF;
+  --text-main: #E6F1FF;
+  --text-dim: #8FA3C7;
+  --border: rgba(0, 194, 255, 0.2);
+}
+
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #0A0F1F;
-  color: #E6F1FF;
+  background: radial-gradient(circle at top, #0F2A44, #0A0F1F);
+  color: var(--text-main);
+  font-family: 'Inter', sans-serif;
 }
 
-a {
-  color: #00C2FF;
-  text-decoration: none;
-}
-
+/* Cards */
 .card {
-  background: #0F2A44;
-  padding: 20px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
   border-radius: 16px;
-  border: 1px solid rgba(0,194,255,0.2);
+  padding: 20px;
+  transition: 0.3s ease;
 }
 
+.card:hover {
+  box-shadow: 0 0 30px rgba(0, 194, 255, 0.25);
+  transform: translateY(-4px);
+}
+
+/* Buttons */
 .button {
-  background: #00C2FF;
+  background: linear-gradient(90deg, #00C2FF, #4DE1FF);
+  color: #000;
   border: none;
-  padding: 10px 15px;
-  border-radius: 8px;
+  padding: 10px 18px;
+  border-radius: 10px;
   cursor: pointer;
+  font-weight: 600;
+}
+
+/* Navbar */
+.navbar {
+  background: rgba(15, 42, 68, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
 }
