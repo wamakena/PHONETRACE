@@ -1,20 +1,34 @@
-import { sql } from "@neondatabase/serverless";
+import { neon } from "@neondatabase/serverless";
+
+export const runtime = "nodejs";
+
+const sql = neon(process.env.DATABASE_URL);
 
 export async function POST(req) {
   try {
-    const { device_name, sim_number, owner_id, assigned_to_id } = await req.json();
-    if (!device_name || !sim_number || !owner_id) {
-      return new Response(JSON.stringify({ success: false, error: "Missing required fields" }), { status: 400 });
+    const body = await req.json();
+    const { imei, model, owner_id } = body;
+
+    if (!imei || !owner_id) {
+      return Response.json(
+        { error: "IMEI and owner_id are required" },
+        { status: 400 }
+      );
     }
 
     const result = await sql`
-      INSERT INTO devices (device_name, sim_number, owner_id, assigned_to_id)
-      VALUES (${device_name}, ${sim_number}, ${owner_id}, ${assigned_to_id})
-      RETURNING *
+      INSERT INTO devices (imei, model, owner_id, status, created_at)
+      VALUES (${imei}, ${model || null}, ${owner_id}, 'active', NOW())
+      RETURNING *;
     `;
 
-    return new Response(JSON.stringify({ success: true, device: result[0] }), { status: 200 });
+    return Response.json({ success: true, device: result[0] });
+
   } catch (err) {
-    return new Response(JSON.stringify({ success: false, error: err.message }), { status: 500 });
+    console.error("REGISTER DEVICE ERROR:", err);
+    return Response.json(
+      { error: "Failed to register device" },
+      { status: 500 }
+    );
   }
 }
