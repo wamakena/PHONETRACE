@@ -8,31 +8,51 @@ import Sidebar from "@/components/Sidebar";
 import DashboardStats from "@/components/DashboardStats";
 import LiveMap from "@/components/LiveMap";
 
+import { supabase } from "@/lib/supabaseClient";
+
 export default function WebhostDashboard() {
   const { data: session } = useSession();
   const router = useRouter();
   const [devices, setDevices] = useState([]);
+  const [alerts, setAlerts] = useState([]);
 
-  // Fetch devices
+  useEffect(() => {
+    if (!session) return router.push("/auth/signin");
+    fetchDevices();
+
+    // Real-time subscription
+    const deviceSub = supabase
+      .from("devices")
+      .on("*", () => fetchDevices())
+      .subscribe();
+
+    const alertSub = supabase
+      .from("alerts")
+      .on("INSERT", payload => {
+        setAlerts(prev => [payload.new, ...prev]);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeSubscription(deviceSub);
+      supabase.removeSubscription(alertSub);
+    };
+  }, [session]);
+
   const fetchDevices = async () => {
-    if (!session) return;
-    const res = await fetch(`/api/devices/list?userId=${session.user.id}`);
-    const data = await res.json();
-    setDevices(data);
+    const { data } = await supabase
+      .from("devices")
+      .select("*, owner:users(name)")
+      .eq("assigned_to_id", session.user.id); // role-based
+    setDevices(data || []);
   };
 
-  // On load
-  useEffect(() => {
-    if (!session) router.push("/auth/signin");
-    else fetchDevices();
-
-    // Poll every 10 seconds
-    const interval = setInterval(() => {
-      fetchDevices();
-    }, 10000); // 10 seconds
-
-    return () => clearInterval(interval);
-  }, [session]);
+  const cards = [
+    { title: "📡 Devices", href: "/webhost/devices" },
+    { title: "📍 Live Tracking", href: "/webhost/tracking" },
+    { title: "⚠️ Threat Detection", href: "/webhost/alerts" },
+    { title: "🔒 Security Control", href: "/webhost/security" },
+  ];
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f0f2f5" }}>
@@ -42,10 +62,10 @@ export default function WebhostDashboard() {
         <main style={{ padding: "30px", maxWidth: "1200px", margin: "0 auto" }}>
           <h2 style={{ fontSize: "24px", marginBottom: "20px" }}>SIMTRACE Command Center</h2>
 
-          {/* Real-Time Stats */}
-          <DashboardStats userId={session?.user.id} devices={devices} />
+          {/* Stats */}
+          <DashboardStats devices={devices} />
 
-          {/* Main Cards */}
+          {/* Cards */}
           <div style={{
             display: "grid",
             gap: "20px",
@@ -53,11 +73,21 @@ export default function WebhostDashboard() {
             marginBottom: "30px"
           }}>
             {cards.map(card => (
-              <a key={card.title} href={card.href} style={cardStyle}>
-                {card.title}
-              </a>
+              <a key={card.title} href={card.href} style={cardStyle}>{card.title}</a>
             ))}
           </div>
+
+          {/* Alerts */}
+          {alerts.length > 0 && (
+            <div style={{ marginBottom: "30px" }}>
+              <h3>Real-Time Alerts</h3>
+              {alerts.map((alert, idx) => (
+                <div key={idx} style={{ background: "#ffe0e0", padding: "12px", marginBottom: "10px", borderRadius: "8px" }}>
+                  <strong>{alert.device_name}</strong>: {alert.message}
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Live Map */}
           <h3>Live Device Locations</h3>
@@ -68,15 +98,6 @@ export default function WebhostDashboard() {
   );
 }
 
-// Cards
-const cards = [
-  { title: "📡 Devices", href: "/webhost/devices" },
-  { title: "📍 Live Tracking", href: "/webhost/tracking" },
-  { title: "⚠️ Threat Detection", href: "/webhost/alerts" },
-  { title: "🔒 Security Control", href: "/webhost/security" },
-];
-
-// Card styles
 const cardStyle = {
   padding: "20px",
   backgroundColor: "#fff",
