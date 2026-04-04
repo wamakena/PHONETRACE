@@ -8,22 +8,28 @@ export default function Dashboard() {
       <div style={{
         display: "grid",
         gap: "20px",
+        marginTop: "20px",
         gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))"
       }}>
-        
+
         <div className="card">
           <h3>📡 Devices</h3>
-          <p>3 Active Devices</p>
+          <p>Monitor registered devices</p>
         </div>
 
         <div className="card">
-          <h3>📍 Tracking</h3>
-          <p>Live monitoring enabled</p>
+          <h3>📍 Live Tracking</h3>
+          <p>Real-time location tracking</p>
         </div>
 
         <div className="card">
-          <h3>⚠️ Alerts</h3>
-          <p>No threats detected</p>
+          <h3>⚠️ Threat Detection</h3>
+          <p>SIM swap & anomaly alerts</p>
+        </div>
+
+        <div className="card">
+          <h3>🔒 Security Control</h3>
+          <button className="button">Lock Device</button>
         </div>
 
       </div>
