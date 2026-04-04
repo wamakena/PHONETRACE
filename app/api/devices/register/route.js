@@ -1,38 +1,35 @@
-import { sql } from "@/lib/db";
-
-export const runtime = "nodejs";
+import { supabase } from "@/lib/db";
+import { NextResponse } from "next/server";
 
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { imei, model, owner_id } = body;
+    const { user_id, device_id, sim_number } = body;
 
-    if (!imei || !owner_id) {
-      return new Response(
-        JSON.stringify({ error: "imei and owner_id required" }),
+    if (!user_id || !device_id) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
-    const result = await sql`
-      INSERT INTO devices (imei, model, owner_id)
-      VALUES (${imei}, ${model || null}, ${owner_id})
-      RETURNING *;
-    `;
+    const { data, error } = await supabase
+      .from("devices")
+      .insert([
+        {
+          user_id,
+          device_id,
+          sim_number,
+        },
+      ])
+      .select();
 
-    return new Response(
-      JSON.stringify({ device: result[0] }),
-      { status: 200 }
-    );
+    if (error) throw error;
 
+    return NextResponse.json({ success: true, data });
   } catch (err) {
-    console.error("REGISTER DEVICE ERROR:", err);
-
-    return new Response(
-      JSON.stringify({
-        error: "Failed to register device",
-        message: err.message,
-      }),
+    return NextResponse.json(
+      { error: err.message },
       { status: 500 }
     );
   }
