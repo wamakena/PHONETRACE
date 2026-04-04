@@ -1,72 +1,12 @@
-/* styles/globals.css */
-
-/* Base reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+:root {
+  --bg-main: #0A0F1F;
+  --bg-card: #0F2A44;
+  --accent: #00C2FF;
+  --accent-glow: #4DE1FF;
+  --text-main: #E6F1FF;
 }
 
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: #f9fafb;
-  color: #111827;
+  background: var(--bg-main);
+  color: var(--text-main);
 }
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-button {
-  cursor: pointer;
-  border: none;
-  border-radius: 6px;
-  padding: 0.5rem 1rem;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-/* Card styling */
-.card {
-  background-color: #ffffff;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  margin-bottom: 1.5rem;
-}
-
-/* Portal Branding Colors */
-:root {
-  --superadmin-primary: #4F46E5;
-  --superadmin-secondary: #C7D2FE;
-
-  --admin-primary: #10B981;
-  --admin-secondary: #A7F3D0;
-
-  --manager-primary: #F59E0B;
-  --manager-secondary: #FEF3C7;
-
-  --tenant-primary: #3B82F6;
-  --tenant-secondary: #DBEAFE;
-}
-
-/* Dynamic classes for portals */
-.superadmin-nav { background-color: var(--superadmin-primary); color: white; }
-.admin-nav { background-color: var(--admin-primary); color: white; }
-.manager-nav { background-color: var(--manager-primary); color: white; }
-.tenant-nav { background-color: var(--tenant-primary); color: white; }
-
-/* Buttons dynamic */
-button.superadmin { background-color: var(--superadmin-primary); color: white; }
-button.admin { background-color: var(--admin-primary); color: white; }
-button.manager { background-color: var(--manager-primary); color: white; }
-button.tenant { background-color: var(--tenant-primary); color: white; }
-
-button:hover { opacity: 0.85; }
-
-/* Cards dynamic background */
-.card.superadmin { border-left: 6px solid var(--superadmin-primary); }
-.card.admin { border-left: 6px solid var(--admin-primary); }
-.card.manager { border-left: 6px solid var(--manager-primary); }
-.card.tenant { border-left: 6px solid var(--tenant-primary); }
