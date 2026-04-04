@@ -13,16 +13,26 @@ export default function WebhostDashboard() {
   const router = useRouter();
   const [devices, setDevices] = useState([]);
 
-  useEffect(() => {
-    if (!session) router.push("/auth/signin");
-    else fetchDevices();
-  }, [session]);
-
+  // Fetch devices
   const fetchDevices = async () => {
+    if (!session) return;
     const res = await fetch(`/api/devices/list?userId=${session.user.id}`);
     const data = await res.json();
     setDevices(data);
   };
+
+  // On load
+  useEffect(() => {
+    if (!session) router.push("/auth/signin");
+    else fetchDevices();
+
+    // Poll every 10 seconds
+    const interval = setInterval(() => {
+      fetchDevices();
+    }, 10000); // 10 seconds
+
+    return () => clearInterval(interval);
+  }, [session]);
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f0f2f5" }}>
@@ -32,20 +42,21 @@ export default function WebhostDashboard() {
         <main style={{ padding: "30px", maxWidth: "1200px", margin: "0 auto" }}>
           <h2 style={{ fontSize: "24px", marginBottom: "20px" }}>SIMTRACE Command Center</h2>
 
-          {/* Stats */}
-          <DashboardStats userId={session?.user.id} />
+          {/* Real-Time Stats */}
+          <DashboardStats userId={session?.user.id} devices={devices} />
 
-          {/* Cards */}
+          {/* Main Cards */}
           <div style={{
             display: "grid",
             gap: "20px",
             gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
             marginBottom: "30px"
           }}>
-            <a href="/webhost/devices" style={{ ...cardStyle }}>📡 Devices</a>
-            <a href="/webhost/tracking" style={{ ...cardStyle }}>📍 Live Tracking</a>
-            <a href="/webhost/alerts" style={{ ...cardStyle }}>⚠️ Threat Detection</a>
-            <a href="/webhost/security" style={{ ...cardStyle }}>🔒 Security Control</a>
+            {cards.map(card => (
+              <a key={card.title} href={card.href} style={cardStyle}>
+                {card.title}
+              </a>
+            ))}
           </div>
 
           {/* Live Map */}
@@ -57,7 +68,15 @@ export default function WebhostDashboard() {
   );
 }
 
-// Card inline styles
+// Cards
+const cards = [
+  { title: "📡 Devices", href: "/webhost/devices" },
+  { title: "📍 Live Tracking", href: "/webhost/tracking" },
+  { title: "⚠️ Threat Detection", href: "/webhost/alerts" },
+  { title: "🔒 Security Control", href: "/webhost/security" },
+];
+
+// Card styles
 const cardStyle = {
   padding: "20px",
   backgroundColor: "#fff",
