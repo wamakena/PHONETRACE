@@ -5,30 +5,35 @@ export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    if (!process.env.DATABASE_URL) {
-      console.error("Missing DATABASE_URL");
-      return NextResponse.json(
-        { error: "Database not configured" },
-        { status: 500 }
-      );
+    const connectionString = process.env.DATABASE_URL;
+
+    // 🔍 DEBUG 1: Check env
+    console.log("DB URL exists:", !!connectionString);
+
+    if (!connectionString) {
+      throw new Error("DATABASE_URL is missing");
     }
 
-    const sql = neon(process.env.DATABASE_URL);
+    const sql = neon(connectionString);
 
-    const devices = await sql`
-      SELECT * FROM devices
-      ORDER BY created_at DESC;
-    `;
+    // 🔍 DEBUG 2: Raw query (more stable)
+    const devices = await sql(
+      "SELECT * FROM devices ORDER BY created_at DESC"
+    );
+
+    // 🔍 DEBUG 3: Check result
+    console.log("Devices fetched:", devices.length);
 
     return NextResponse.json({ devices });
 
   } catch (err) {
-    console.error("LIST DEVICES ERROR:", err);
+    console.error("❌ FULL ERROR:", err);
 
     return NextResponse.json(
       {
         error: "Failed to fetch devices",
-        details: err.message, // 👈 helps debugging
+        message: err.message,
+        hint: "Check logs in Vercel → Functions",
       },
       { status: 500 }
     );
