@@ -1,19 +1,23 @@
-import { sql } from "@neondatabase/serverless";
+import { neon } from "@neondatabase/serverless";
 
-export async function GET(req) {
+export const runtime = "nodejs";
+
+const sql = neon(process.env.DATABASE_URL);
+
+export async function GET() {
   try {
-    const url = new URL(req.url);
-    const assignedTo = url.searchParams.get("assigned_to_id"); // filter by user
-    const owner = url.searchParams.get("owner_id"); // filter by webhost/admin
+    const devices = await sql`
+      SELECT * FROM devices
+      ORDER BY created_at DESC;
+    `;
 
-    const devices = assignedTo
-      ? await sql`SELECT * FROM devices WHERE assigned_to_id = ${assignedTo}`
-      : owner
-      ? await sql`SELECT * FROM devices WHERE owner_id = ${owner}`
-      : await sql`SELECT * FROM devices`;
+    return Response.json({ devices });
 
-    return new Response(JSON.stringify(devices), { status: 200 });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+    console.error("LIST DEVICES ERROR:", err);
+    return Response.json(
+      { error: "Failed to fetch devices" },
+      { status: 500 }
+    );
   }
 }
