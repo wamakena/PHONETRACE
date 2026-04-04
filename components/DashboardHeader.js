@@ -14,21 +14,14 @@ export default function DashboardHeader() {
       borderBottom: "1px solid #ccc",
       backgroundColor: "#f7f9fc"
     }}>
-      {/* Logo + Slogan */}
       <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-        <Image 
-          src="/logo.png"
-          alt="SIMTRACE Logo"
-          width={60}
-          height={60}
-        />
+        <Image src="/logo.png" alt="SIMTRACE Logo" width={60} height={60} />
         <div>
           <h1 style={{ margin: 0, fontSize: "28px", fontWeight: "bold" }}>SIMTRACE</h1>
           <p style={{ margin: 0, color: "#555", fontSize: "14px" }}>Connect. Protect. Recover.</p>
         </div>
       </div>
 
-      {/* User info + Logout */}
       {session && (
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <span style={{ color: "#333" }}>{session.user.name} ({session.user.role})</span>
