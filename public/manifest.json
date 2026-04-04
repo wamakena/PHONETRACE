@@ -1,0 +1,9 @@
+
+{
+"name":"SIMTRACE",
+"short_name":"SIMTRACE",
+"start_url":"/mobile",
+"display":"standalone",
+"background_color":"#0A66FF",
+"theme_color":"#0A66FF"
+}
