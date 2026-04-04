@@ -1,27 +1,29 @@
-import { sql } from "@/lib/db";
+import { supabase } from "@/lib/db";
+import { NextResponse } from "next/server";
 
-export const runtime = "nodejs";
-
-export async function GET() {
+export async function GET(req) {
   try {
-    const devices = await sql`
-      SELECT * FROM devices
-      ORDER BY id DESC;
-    `;
+    const { searchParams } = new URL(req.url);
+    const user_id = searchParams.get("user_id");
 
-    return new Response(
-      JSON.stringify({ devices }),
-      { status: 200 }
-    );
+    if (!user_id) {
+      return NextResponse.json(
+        { error: "Missing user_id" },
+        { status: 400 }
+      );
+    }
 
+    const { data, error } = await supabase
+      .from("devices")
+      .select("*")
+      .eq("user_id", user_id);
+
+    if (error) throw error;
+
+    return NextResponse.json({ success: true, data });
   } catch (err) {
-    console.error("LIST DEVICES ERROR:", err);
-
-    return new Response(
-      JSON.stringify({
-        error: "Failed to fetch devices",
-        message: err.message,
-      }),
+    return NextResponse.json(
+      { error: err.message },
       { status: 500 }
     );
   }
