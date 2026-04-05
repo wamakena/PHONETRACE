@@ -1,30 +1,19 @@
-import { supabase } from "@/lib/db";
-import { NextResponse } from "next/server";
+import { sql } from "@neondatabase/serverless";
 
 export async function GET(req) {
   try {
-    const { searchParams } = new URL(req.url);
-    const user_id = searchParams.get("user_id");
+    const url = new URL(req.url);
+    const assignedTo = url.searchParams.get("assigned_to_id"); // filter by user
+    const owner = url.searchParams.get("owner_id"); // filter by webhost/admin
 
-    if (!user_id) {
-      return NextResponse.json(
-        { error: "Missing user_id" },
-        { status: 400 }
-      );
-    }
+    const devices = assignedTo
+      ? await sql`SELECT * FROM devices WHERE assigned_to_id = ${assignedTo}`
+      : owner
+      ? await sql`SELECT * FROM devices WHERE owner_id = ${owner}`
+      : await sql`SELECT * FROM devices`;
 
-    const { data, error } = await supabase
-      .from("devices")
-      .select("*")
-      .eq("user_id", user_id);
-
-    if (error) throw error;
-
-    return NextResponse.json({ success: true, data });
+    return new Response(JSON.stringify(devices), { status: 200 });
   } catch (err) {
-    return NextResponse.json(
-      { error: err.message },
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
   }
 }
