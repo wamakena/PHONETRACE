@@ -1,36 +1,20 @@
-import { supabase } from "@/lib/db";
-import { NextResponse } from "next/server";
+import { sql } from "@neondatabase/serverless";
 
 export async function POST(req) {
   try {
-    const body = await req.json();
-    const { user_id, device_id, sim_number } = body;
-
-    if (!user_id || !device_id) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+    const { device_name, sim_number, owner_id, assigned_to_id } = await req.json();
+    if (!device_name || !sim_number || !owner_id) {
+      return new Response(JSON.stringify({ success: false, error: "Missing required fields" }), { status: 400 });
     }
 
-    const { data, error } = await supabase
-      .from("devices")
-      .insert([
-        {
-          user_id,
-          device_id,
-          sim_number,
-        },
-      ])
-      .select();
+    const result = await sql`
+      INSERT INTO devices (device_name, sim_number, owner_id, assigned_to_id)
+      VALUES (${device_name}, ${sim_number}, ${owner_id}, ${assigned_to_id})
+      RETURNING *;
+    `;
 
-    if (error) throw error;
-
-    return NextResponse.json({ success: true, data });
+    return new Response(JSON.stringify({ success: true, device: result[0] }), { status: 200 });
   } catch (err) {
-    return NextResponse.json(
-      { error: err.message },
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ success: false, error: err.message }), { status: 500 });
   }
 }
