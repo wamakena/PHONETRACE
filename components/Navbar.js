@@ -1,11 +1,23 @@
-import Link from "next/link";
+import React, { useState } from "react";
+import "./Navbar.css";
 
-export default function Navbar() {
+const Navbar = ({ toggleSidebar }) => {
+  const [mobileMenu, setMobileMenu] = useState(false);
+
   return (
-    <nav style={{ display: "flex", gap: "20px" }}>
-      <Link href="/dashboard">Dashboard</Link>
-      <Link href="/devices">Devices</Link>
-      <Link href="/tracking">Tracking</Link>
-    </nav>
+    <div className="navbar">
+      <div className="navbar-left">
+        <button className="mobile-toggle" onClick={() => toggleSidebar()}>
+          ☰
+        </button>
+        <h2>Enterprise SaaS</h2>
+      </div>
+      <div className="navbar-right">
+        <div className="notification">🔔 3</div>
+        <div className="profile">👤 Admin</div>
+      </div>
+    </div>
   );
-}
+};
+
+export default Navbar;
