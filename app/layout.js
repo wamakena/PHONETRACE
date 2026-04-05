@@ -1,41 +1,22 @@
-import '../styles/globals.css';
-import Image from 'next/image';
-import Link from 'next/link';
+// app/layout.js
+import './globals.css';
+import Sidebar from '../components/Sidebar';
+import Navbar from '../components/Navbar';
 
 export const metadata = {
-  title: 'SIMTRACE',
-  description: 'Global device tracking system',
+  title: 'Enterprise SaaS',
+  description: 'Professional SaaS Dashboard',
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>
-        
-        <header className="navbar" style={{
-          display: "flex",
-          justifyContent: "space-between",
-          padding: "16px 24px",
-          alignItems: "center"
-        }}>
-          
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <Image src="/logo.png" width={40} height={40} alt="logo" />
-            <strong>SIMTRACE</strong>
-          </div>
-
-          <nav style={{ display: "flex", gap: "20px" }}>
-            <Link href="/dashboard">Dashboard</Link>
-            <Link href="/devices">Devices</Link>
-            <Link href="/tracking">Tracking</Link>
-          </nav>
-
-        </header>
-
-        <main style={{ padding: "24px" }}>
-          {children}
-        </main>
-
+      <body style={{ display: 'flex' }}>
+        <Sidebar />
+        <div style={{ marginLeft: '220px', flex: 1 }}>
+          <Navbar />
+          <main style={{ padding: '20px' }}>{children}</main>
+        </div>
       </body>
     </html>
   );
