@@ -1,38 +1,73 @@
-"use client";
+// app/dashboard/page.js
+import React, { useState, useEffect } from 'react';
+import Card from '../../components/Card';
+import AnalyticsCard from '../../components/AnalyticsCard';
+import AnalyticsChart from '../../components/AnalyticsChart';
+import AdBoard from '../../components/AdBoard';
+import CheckoutButton from '../../components/CheckoutButton';
 
-export default function Dashboard() {
+export default function DashboardPage() {
+  const [data, setData] = useState(null);
+  const [subscription, setSubscription] = useState({ plan: 'free' });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetch('/api/dashboard', { cache: 'no-store' });
+      const json = await res.json();
+      setData(json);
+    };
+    fetchData();
+  }, []);
+
+  if (!data) return <div style={{ padding: '50px', textAlign: 'center' }}>Loading dashboard...</div>;
+
   return (
-    <div>
-      <h1>SIMTRACE Command Center</h1>
+    <>
+      <AdBoard ads={[{ text: 'Upgrade to Pro!', link: '/pricing' }]} />
 
-      <div style={{
-        display: "grid",
-        gap: "20px",
-        marginTop: "20px",
-        gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))"
-      }}>
-
-        <div className="card">
-          <h3>📡 Devices</h3>
-          <p>Monitor registered devices</p>
-        </div>
-
-        <div className="card">
-          <h3>📍 Live Tracking</h3>
-          <p>Real-time location tracking</p>
-        </div>
-
-        <div className="card">
-          <h3>⚠️ Threat Detection</h3>
-          <p>SIM swap & anomaly alerts</p>
-        </div>
-
-        <div className="card">
-          <h3>🔒 Security Control</h3>
-          <button className="button">Lock Device</button>
-        </div>
-
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', marginBottom: '20px' }}>
+        {data.kpis.map((kpi, idx) => (
+          <AnalyticsCard key={idx} title={kpi.title} value={kpi.value} trend={kpi.trend} />
+        ))}
       </div>
-    </div>
+
+      <AnalyticsChart data={data.chartData} title="Monthly Active Users Trend" />
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', marginTop: '20px' }}>
+        <Card
+          title="📡 Devices"
+          description="Monitor registered devices"
+          buttons={data.devices.map(d => ({
+            label: `${d.name} (${d.status})`,
+            link: '/devices',
+            icon: d.status === 'Active' ? '✅' : '⚠️',
+          }))}
+        />
+        <Card
+          title="👥 Users"
+          description="Manage system users"
+          buttons={data.users.map(u => ({
+            label: `${u.name} (${u.role})`,
+            link: '/users',
+            icon: u.role === 'Admin' ? '⭐' : '👤',
+          }))}
+        />
+      </div>
+
+      {subscription.plan === 'premium' && (
+        <Card
+          title="📦 Inventory Pro"
+          description="Advanced inventory"
+          buttons={[{ label: 'All Items', link: '/inventory' }]}
+        />
+      )}
+
+      {subscription.plan === 'free' && (
+        <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#fef3c7', borderRadius: '12px', textAlign: 'center' }}>
+          🌟 Upgrade to Premium to unlock Pro modules!
+          <CheckoutButton plan="premium" />
+        </div>
+      )}
+    </>
   );
 }
